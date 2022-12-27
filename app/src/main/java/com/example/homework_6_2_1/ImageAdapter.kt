@@ -1,44 +1,45 @@
 package com.example.homework_6_2_1
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.example.homework_6_2_1.databinding.ImageItemBinding
 
 class ImageAdapter(
-    private val context: Context,
-    private val imageList:List<Int>
-): BaseAdapter() {
-   private var layoutInflater: LayoutInflater? = null
-    var selectedPositions = arrayListOf<Int>()
+    private var list: ArrayList<Int>,
+    private val selectItem: ((image: Int) -> Unit)?,
+    private val deleteItem: ((image: Int) -> Unit)?
+):
+    RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
-    override fun getCount(): Int {
-        return imageList.size
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+        return ImageViewHolder(ImageItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
     }
 
-    override fun getItem(position: Int): Any? {
-        return null
+    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+        holder.bind(list[position])
     }
 
-    override fun getItemId(position: Int): Long {
-        return 0
+    override fun getItemCount(): Int {
+        return list.size
     }
 
-    override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
-        var convertView = view
-        if (layoutInflater == null) {
-            layoutInflater =
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    inner class ImageViewHolder(private val binding: ImageItemBinding): ViewHolder(binding.root){
+        fun bind(image: Int){
+            binding.imageView.setImageResource(image)
+
+            binding.imageView.setOnClickListener{
+                if (binding.viewDark.visibility == View.GONE) {
+                    selectItem?.let { it1 -> it1(image) }
+                    binding.viewDark.visibility = View.VISIBLE
+                } else {
+                    deleteItem?.let { it1 -> it1(image) }
+                    binding.viewDark.visibility = View.GONE
+                }
+            }
         }
-        if (convertView == null) {
-            convertView = layoutInflater!!.inflate(R.layout.gridview_item,null)
-        }
-        val imageView:ImageView = convertView?.findViewById(R.id.imageView) as ImageView
-        imageView.setImageResource(imageList[position])
-        return convertView
     }
+
 }
-
-
